@@ -1,3 +1,4 @@
+require "yaml"
 class Game
   def initialize(words)
     @solution = words[rand(words.length)].split("")
@@ -9,6 +10,7 @@ class Game
 
   def start
     puts "New game"
+    puts "At any time, type 'save' to save the game or 'exit' to exit."
     @solution.length.times do
       @word.push("_")
     end
@@ -16,27 +18,38 @@ class Game
     play
   end
 
-  private
-
   def play
     check(guess)
     display(@word,@wrong_letters)
     next_turn
   end
 
+  private
+
+  def user_input(input)
+    if input == "save"
+      save_game
+      play
+    elsif input == "exit"
+      puts "Bye!"
+      exit
+    else
+      return input
+    end
+  end
+
   def guess
-    puts ""
     puts "Enter a letter:"
-    letter = gets.chomp.downcase
+    letter = user_input(gets.chomp.downcase)
     while true
       if @all_letters.include?(letter)
         break
-      elsif letter =~ /[a-z]/
+      elsif letter.length == 1 && letter =~ /[a-z]/
         puts "You've tried this one already, try again: "
       else
         puts "Not a letter, try again: "
       end
-      letter = gets.chomp.downcase
+      letter = user_input(gets.chomp.downcase)
     end
     @guesses -= 1
     return letter
@@ -84,4 +97,10 @@ class Game
     exit
   end
 
+  def save_game
+    File.open("saved_game.yml", "w") do |file|
+      file.write(YAML.dump(self))
+    end
+    puts "Game saved."
+  end
 end
