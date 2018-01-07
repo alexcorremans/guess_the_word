@@ -16,6 +16,13 @@ end
 if choice == "new"
   Game.new(words).start
 else
-  game = YAML.load_file("saved_game.yml")
-  game.play
+  puts "What name did you save your game as?"
+  begin
+    filename = gets.chomp.downcase
+    game = YAML.load_file("saved_games/#{filename}.yml")
+    game.play
+  rescue
+    puts "No saved files with that name. Try again:"
+    retry
+  end
 end
